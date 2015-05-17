@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "xless.js 是一个css3运动框架，同时提供了js作为降级处理",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "author": "roy",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-travis": "^0.2.3"
+  }
 }
