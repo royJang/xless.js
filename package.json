@@ -1,0 +1,10 @@
+{
+  "name": "xless.js",
+  "version": "0.0.1",
+  "description": "xless.js 是一个css3运动框架，同时提供了js作为降级处理",
+  "main": "index.js",
+  "scripts": {
+  },
+  "author": "roy",
+  "license": "MIT"
+}
