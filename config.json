@@ -1,0 +1,8 @@
+{
+  "bounce" : {
+    "bounce" : {
+       "css" : "bounce.css",
+       "js"  : "bounce.js"
+    }
+  }
+}
