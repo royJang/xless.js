@@ -1,6 +1,5 @@
-xless.foundation({
+xless.extend({
     name : 'bounce',
-    duration : 1000,
     support: [
         'transform',
         'transform-origin',

@@ -21,7 +21,7 @@ var xless = (function (window, document, undefined) {
      */
     var checkStyle = function (property) {
         var o = false;
-        label : for (var i = 0, len = kl; i < len; i++) {
+        for (var i = 0, len = kl; i < len; i++) {
             var _property = keys[i] === "" ? property :
                 property.indexOf("-") > -1 ? (property.charAt(0).toUpperCase() + property.slice(1).replace(/-([a-z])/g,function (n, a){
                     return a.toUpperCase();
@@ -29,11 +29,11 @@ var xless = (function (window, document, undefined) {
 
             if (xStyle[keys[i] + _property] !== undefined) {
                 o = true;
-                break label;
+                break;
             }
         }
         return o;
-    }
+    };
 
     /*
     * 返回come,out,pause 方法
@@ -68,31 +68,32 @@ var xless = (function (window, document, undefined) {
     xless.classList = ctrl;
 
     /*
-    * 为xless.js插件机制
+    * xless.js插件机制
     * @public
-    * @param f - 一个object对象, 目前所要填写如下内容
-    *   f.name - 插件名称
-    *   f.support - 插件css3需要的属性
-    *   f.use - 使用css3方法执行
-    *   f.fallback - 当css3属性不支持使用js方法执行
+    * @param f - 一个object对象, 参数如下
+    *
+    *   f.name     - {String}      插件名称
+    *   f.duration - {Number}      插件持续时间, 默认为 1000 毫秒
+    *   f.support  - {Array}       插件css3需要的属性
+    *   f.use      - {Function}    使用css3方法执行
+    *   f.fallback - {Function}    当css3属性不支持使用js方法执行
+    *
     * @returns {Function} 执行当前动画效果
     */
-    xless.foundation = function (f) {
+    var extend = function (f) {
         xless[f.name] = function ( el ) {
-
             if( !el ) return;
-
             var o = true;
-
-            g : for(var i = 0,len = f.support.length; i<len; i++){
+            for(var i = 0,len = f.support.length; i<len; i++){
                 if(!checkStyle(f.support[i])){
                    o = false;
-                   break g;
+                   break;
                 }
             }
-
             return function (){
                 return o ? (function (){
+                    //执行默认事件
+                    f.use(el);
                     //持续时间不为infinite的话，则在持续时间结束后，移除class
                     return f.duration !== "infinite" && setTimeout(function (){
                         ctrl.remove( el, f.name );
@@ -100,14 +101,10 @@ var xless = (function (window, document, undefined) {
                 })() : f.fallback(el);
             }
         }
-    }
+    };
+
+    xless.extend = extend;
 
     return xless;
 
-})(window, document, undefined)
-
-var s = document.getElementById("smile");
-
-var bounce = xless.bounce(s);
-
-bounce();
+})(window, document, undefined);

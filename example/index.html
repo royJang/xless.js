@@ -3,14 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <link href="../build/xless.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
+        .wrapper { width:500px; margin: 100px auto; }
         #smile { width:100px; height:100px; background: #09c; }
+        #btn { margin-top:100px;}
     </style>
 </head>
 <body>
 
-<div id="smile"></div>
+<div class="wrapper">
+    <div id="smile"></div>
+    <button id="btn">Button</button>
+</div>
 
-<script src="../src/xless.js"></script>
+<script src="../build/xless.min.js"></script>
+<script>
+
+    var btn = document.getElementById("btn");
+    var s = document.getElementById("smile");
+
+    var bounce = xless.bounce(s);
+
+    btn.onclick = function (){
+        bounce();
+    };
+
+</script>
 </body>
 </html>
