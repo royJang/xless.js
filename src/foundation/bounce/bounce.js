@@ -11,7 +11,8 @@ xless.extend({
     use : function ( el ) {
         xless.classList.add( el, this.name );
     },
-    fallback : function ( el ) {
-
+    fallback : function ( el, evt ) {
+        evt.start(el)
+            .to(200,200);
     }
 });

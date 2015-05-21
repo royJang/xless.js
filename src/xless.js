@@ -2,16 +2,103 @@
  * Created by roy on 15/5/17.
  */
 
+(function () {
+    var lastTime = 0;
+    var vendors = ['webkit', 'moz'];
+    for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame =
+            window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame){
+        window.requestAnimationFrame = function (callback) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                },
+                timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+    if (!window.cancelAnimationFrame){
+        window.cancelAnimationFrame = function (id) {
+            clearTimeout(id);
+        };
+    }
+}());
+
 var xless = (function (window, document, undefined) {
 
     var version = "0.0.1",
         xless = {},
+        doc = document.body || document.documentElement,
         myElemenet = "xless",
         x = document.createElement(myElemenet),
         xStyle = x.style,
         keys = ["webkit", "", "moz", "ms", "o"],
         kl = keys.length,
-        isSupportClassList = xStyle.classList == undefined;
+        isSupportClassList = xStyle.classList == undefined,
+        FPS = 60,
+        Speed = 10;
+
+    var animate = {
+        start : function ( obj ){
+
+            var _obj = obj,
+                w = obj.offsetWidth,
+                h = obj.offsetHeight;
+
+            //从目标元素开始向外遍历，累加top和left值
+            for (var t1 = obj.offsetTop, l1 = obj.offsetLeft; _obj = _obj.offsetParent;) {
+                t1 += _obj.offsetTop;
+                l1 += _obj.offsetLeft;
+            }
+
+            var m = obj.cloneNode();
+            obj.style.visibility = "hidden";
+            m.style.position = "absolute";
+            m.style.left = l1 + 'px';
+            m.style.top = t1 + 'px';
+            doc.appendChild(m);
+
+            this.m = m;
+
+            timer = null;
+            var self = this;
+            this.to = function ( x, y ){
+                self.l = x;
+                self.t = y;
+                self.update();
+                return this.obj;
+            };
+            this.stop = function (){
+                timer && window.cancelAnimationFrame(timer);
+                this.to = null;
+                this.stop = null;
+                return;
+            }
+            return this;
+        },
+        update : function (){
+            var self = this;
+            if( this.m.offsetLeft <= this.l ){
+                this.m.style.left = this.m.offsetLeft + Speed + 'px';
+            }
+            if( this.m.offsetTop <= this.t ){
+                this.m.style.top = this.m.offsetTop + Speed + 'px';
+            }
+            if(this.m.offsetLeft <= this.l || this.m.offsetTop <= this.t ){
+                window.requestAnimationFrame(function (){
+                    self.update();
+                });
+            }
+        }
+    };
+
+    xless.animate = animate;
 
     /*
      * 检测是否有此属性
@@ -91,19 +178,34 @@ var xless = (function (window, document, undefined) {
                 }
             }
             return function (){
-                return o ? (function (){
+                return !o ? (function (){
                     //执行默认事件
                     f.use(el);
                     //持续时间不为infinite的话，则在持续时间结束后，移除class
                     return f.duration !== "infinite" && setTimeout(function (){
                         ctrl.remove( el, f.name );
                     }, f.duration || 1000);
-                })() : f.fallback(el);
+                })() : f.fallback(el, xless.animate);
             }
         }
     };
 
     xless.extend = extend;
+
+    function css(obj, attr, value){
+        switch (arguments.length){
+            case 2:
+                if(typeof arguments[1] == "object"){
+                    for (var i in attr) i == "opacity" ? (obj.style["filter"] = "alpha(opacity=" + attr[i] + ")", obj.style[i] = attr[i] / 100) : obj.style[i] = attr[i];
+                }else{
+                    return obj.currentStyle ? obj.currentStyle[attr] : getComputedStyle(obj, null)[attr]
+                }
+                break;
+            case 3:
+                attr == "opacity" ? (obj.style["filter"] = "alpha(opacity=" + value + ")", obj.style[attr] = value / 100) : obj.style[attr] = value;
+                break;
+        }
+    };
 
     return xless;
 
